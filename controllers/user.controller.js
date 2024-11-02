@@ -1,6 +1,14 @@
-const { createUser, getAllUsers, getUser, updateUser, deleteUser, loginUser, changePassword, updateRecipes } = require("../services/user.service");
+const { validationResult } = require("express-validator");
+const { createUser, getAllUsers, getUser, updateUser, deleteUser, loginUser, changePassword, deleteRecipes, addRecipe } = require("../services/user.service");
 
 const createUserController = async (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        //  return res.status(400).json({error: errors.array().map(error => error.msg)});
+        return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
+    }
+
     try {
         const user = req.body;
         const newUser = await createUser(user);
@@ -68,6 +76,9 @@ const deleteUserController = async (req, res) => {
     try {
         const id = req.params.id;
         const user = await deleteUser(id);
+        // also delete recipes associated with the user
+        deleteRecipes(id, user.user.recipes);
+        
         res.status(200).json({user});
     } catch (err) {
         res.status(500).json({
@@ -116,13 +127,44 @@ const changePasswordController = async (req, res) => {
     }
 };
 
-const updateRecipesController = async(req, res) => {
+const deleteRecipesController = async(req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        //  return res.status(400).json({error: errors.array().map(error => error.msg)});
+        return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
+    }
+    
     const id = req.params.id;
     const { recipes } = req.body;
 
     try {
-        const result = await updateRecipes(id, recipes);
-        res.status(200).json({result});
+        await deleteRecipes(id, recipes);
+        res.status(200).json("deleted successfully");
+    } catch (err) {
+        res.status(400).json({
+            message: "Intenal error occured",
+            details: {
+                error: err.message,
+                info: err.details
+            }
+        });
+    }
+}
+
+const addRecipeController = async(req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        //  return res.status(400).json({error: errors.array().map(error => error.msg)});
+        return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
+    }
+    const id = req.params.id;
+    const recipe = req.body;
+    
+    try {        
+        const newRecipe = await addRecipe(id, recipe);
+        res.status(200).json({newRecipe});
     } catch (err) {
         res.status(400).json({
             message: "Intenal error occured",
@@ -142,5 +184,6 @@ module.exports = {
     deleteUserController,
     loginController,
     changePasswordController,
-    updateRecipesController,
+    deleteRecipesController,
+    addRecipeController,
 }

@@ -14,20 +14,20 @@ const createRecipe = async (recipeData) => {
 }
 
 const getAllRecipes = async () => {
-    // try {
-    //     const recipes = await recipeModel.find().populate({
-    //         path: 'ingredients',
-    //         // populate: {
-    //         //     path: 'categories',
-    //         //     select: "_id name"
-    //         // },
-    //         select: "_id name categories"
-    //     }).lean();
-    //     return recipes;
-    // } catch (err) {
-    //     throw new ErrorProMax("Error getting recipes", err.message || '');
-    // }
-    throw new ErrorProMax("Error getting recipes", "feature disabled");
+    try {
+        const recipes = await recipeModel.find().populate({
+            path: 'ingredients',
+            // populate: {
+            //     path: 'categories',
+            //     select: "_id name"
+            // },
+            select: "_id name categories"
+        }).lean();
+        return recipes;
+    } catch (err) {
+        throw new ErrorProMax("Error getting recipes", err.message || '');
+    }
+    // throw new ErrorProMax("Error getting recipes", "feature disabled");
 }
 
 const getRecipe = async (recipeID) => {
@@ -62,20 +62,17 @@ const updateRecipe = async (recipeID, recipeData) => {
 
 const deleteRecipe = async (recipeID) => {
     try {
+        
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
+        console.log("recieved:", recipeID);
         const recipe = await recipeModel.findByIdAndDelete(recipeID);
+        console.log("recipe:", recipe);
+        
         if (!recipe) {
             throw new Error("Recipe not found");
         }
-
-        // Remove this recipe from all users who have it in their recipes array
-        await userModel.updateMany(
-            { recipes: recipeID },
-            { $pull: { recipes: recipeID } }
-        );
-        
         return recipe;
     } catch (err) {
         throw new ErrorProMax("Error deleting recipe", err.message || '');

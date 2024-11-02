@@ -3,6 +3,7 @@ const ErrorProMax = require('../errors/error.structure');
 const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
+const { deleteRecipe, createRecipe } = require('./recipe.service');
 
 dotenv.config();
 
@@ -70,9 +71,6 @@ const deleteUser = async (userID) => {
         if (!user) {
             throw new Error("User not found");
         }
-
-        // Delete all recipes associated with the user
-        await recipeModel.deleteMany({ userID });
         
         return user;
     } catch (err) {
@@ -119,30 +117,48 @@ const changePassword = async ({ user, oldPassword, newPassword }) => {
     }
 };
 
-const updateRecipes = async ({userID, recipes}) => {
+const deleteRecipes = async (id, recipeIDs) => {
+    if (!mongoose.isValidObjectId(id)) {
+        throw new Error("Invalid user ID format");
+    }
+
+    if (!Array.isArray(recipeIDs)) {
+        throw new Error("Recipes must be an array of IDs");
+    }
+
     try {
-
-        if (!mongoose.isValidObjectId(id)) {
-            throw new Error("Invalid user ID format");
+        if (!Array.isArray(recipeIDs) || recipeIDs.length === 0) {
+            throw new Error("recipes must be a non-empty array.");
         }
-    
-        if (!Array.isArray(recipes)) {
-            throw new Error("Recipes must be an array of IDs");
+        
+        // delete every recipe in the array
+        for (const recipeID of recipeIDs) {
+            await deleteRecipe(recipeID);
         }
 
-        const result = await userModel.updateOne(
-            { _id: userID },
-            { $addToSet: { recipes: { $each: recipes } } },
-            { runValidators: true }
+        // update user recipes array
+        await userModel.updateOne(
+            { _id: id },
+            { $pull: { recipes: { $in: recipeIDs } } }
         );
-
-        if (result.nModified === 0) {
-            throw new Error("No changes made");
-        }
-
-        return result;
     } catch (err) {
-        throw new ErrorProMax('Error changing password', err.message || '');
+        throw new ErrorProMax('Error deleting recipes', err.message || '');
+    }
+}
+
+const addRecipe = async (id, recipe) => {
+    try {
+        const newRecipe = await createRecipe(recipe);
+
+        // add recipeID to the user's recipes array
+        await userModel.updateOne(
+            { _id: id },
+            { $addToSet: { recipes: newRecipe._id } }
+        );
+        
+        return newRecipe;
+    } catch (err) {
+        throw new ErrorProMax('Error adding recipe', err.message || '');
     }
 }
 
@@ -155,5 +171,6 @@ module.exports = {
     deleteUser,
     loginUser,
     changePassword,
-    updateRecipes,
+    deleteRecipes,
+    addRecipe,
 }

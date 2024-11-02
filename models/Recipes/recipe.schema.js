@@ -56,7 +56,7 @@ const recipeSchema = mongoose.Schema(
             type: Number,
             required: [true, "Total preparation time is required"],
             min: [1, "Preparation time must be at least 1 minute"],
-            max: [720, "Preparation time must not exceed 12 hours"]
+            max: [1440, "Preparation time must not exceed 24 hours"]
         },
         inactiveTime: {
             type: Number,
