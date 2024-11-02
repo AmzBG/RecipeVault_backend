@@ -15,7 +15,8 @@ const createIngredient = async (ingredientData) => {
 
 const getAllIngredients = async () => {
     try {
-        const ingredients = await ingredientModel.find().populate('categories');
+        const ingredients = await ingredientModel.find();
+        // const ingredients = await ingredientModel.find().populate('categories');
         return ingredients;
     } catch (err) {
         throw new ErrorProMax("Error getting ingredients", err.message || '');
@@ -27,7 +28,8 @@ const getIngredient = async (ingredientID) => {
         if (!mongoose.isValidObjectId(ingredientID)) {
             throw new Error("Invalid ingredient ID format");
         }
-        const ingredient = await ingredientModel.findById(ingredientID).populate('categories', 'id name');
+        const ingredient = await ingredientModel.findById(ingredientID);
+        // const ingredient = await ingredientModel.findById(ingredientID).populate('categories', 'id name');
         if (!ingredient) {
             throw new Error("Ingredient not found");
         }

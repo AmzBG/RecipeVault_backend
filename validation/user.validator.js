@@ -1,5 +1,5 @@
 const { check, body } = require('express-validator');
-
+const { idValidation } = require('../validation/IDValidation');
 
 const usernameValidation = () => [
     check('username')
@@ -11,17 +11,13 @@ const emailValidation = () => [
     check('email')
         .notEmpty().withMessage("Email is required")
         .isEmail().withMessage("Invalid email format")
-        .isLength({ max: 254 }).withMessage("Email must be at most 254 characters long"), // Optional: Limit email length
+        .isLength({ max: 254 }).withMessage("Email must be at most 254 characters long"),
 ];
 
 const passwordValidation = () => [
     check('password')
         .notEmpty().withMessage("Password is required")
         .isLength({ min: 6, max: 180 }).withMessage("Password must be between 6 and 180 characters long"),
-];
-
-const idValidation = () => [
-    check('id').isMongoId().withMessage("Invalid MongoDB ID format"),
 ];
 
 const recipesValidation = () => [
@@ -50,24 +46,12 @@ const changePasswordValidation = () => [
         .withMessage("New password should contain lowercase, uppercase, number, and special characters"),
 ];
 
-const getUserByIdValidation = [
-    ...idValidation(),
-];
-
-const deleteUserByIdValidation = [
-    ...idValidation(),
-];
-
 const deleteRecipesValidation = [
     ...idValidation(),
     ...recipesValidation(),
 ];
 
-const addRecipeValidation = [
-    // ...idValidation(),
-];
-
-const createUserValidation = [
+const userValidation = [
     ...usernameValidation(),
     ...emailValidation(),
     ...passwordValidation(),
@@ -75,10 +59,7 @@ const createUserValidation = [
 ];
 
 module.exports = {
-    createUserValidation,
-    getUserByIdValidation,
-    deleteUserByIdValidation,
-    changePasswordValidation,
+    userValidation,
     deleteRecipesValidation,
-    addRecipeValidation,
+    changePasswordValidation,
 };

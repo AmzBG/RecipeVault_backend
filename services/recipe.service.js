@@ -15,14 +15,15 @@ const createRecipe = async (recipeData) => {
 
 const getAllRecipes = async () => {
     try {
-        const recipes = await recipeModel.find().populate({
-            path: 'ingredients',
-            // populate: {
-            //     path: 'categories',
-            //     select: "_id name"
-            // },
-            select: "_id name categories"
-        }).lean();
+        const recipes = await recipeModel.find();
+        // const recipes = await recipeModel.find().populate({
+        //     path: 'ingredients',
+        //     // populate: {
+        //     //     path: 'categories',
+        //     //     select: "_id name"
+        //     // },
+        //     select: "_id name categories"
+        // }).lean();
         return recipes;
     } catch (err) {
         throw new ErrorProMax("Error getting recipes", err.message || '');
@@ -35,7 +36,8 @@ const getRecipe = async (recipeID) => {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findById(recipeID).populate('ingredients', 'id name');
+        const recipe = await recipeModel.findById(recipeID);
+        // const recipe = await recipeModel.findById(recipeID).populate('ingredients', 'id name');
         if (!recipe) {
             throw new Error("Recipe not found");
         }

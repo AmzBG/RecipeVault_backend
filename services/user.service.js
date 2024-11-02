@@ -21,7 +21,8 @@ const createUser = async (userData) => {
 
 const getAllUsers = async () => {
     try {
-        const users = await userModel.find().populate('recipes', '_id ingredients')
+        const users = await userModel.find();
+        // const users = await userModel.find().populate('recipes', '_id ingredients');
         return users;
     } catch (err) {
         throw new ErrorProMax("Error getting users", err.message || '');
@@ -34,7 +35,8 @@ const getUser = async (userID) => {
         if (!mongoose.isValidObjectId(userID)) {
             throw new Error("Invalid user ID format");
         }
-        const user = await userModel.findById(userID).populate('recipes', '_id ingredients');
+        const user = await userModel.findById(userID);
+        // const user = await userModel.findById(userID).populate('recipes', '_id ingredients');
         if (!user) {
             throw new Error("User not found");
         }
@@ -43,22 +45,6 @@ const getUser = async (userID) => {
         throw new ErrorProMax("Error getting user", err.message || '');
     }
     // throw new ErrorProMax("Error getting user", "feature disabled");
-};
-
-const updateUser = async (userID, userData) => {
-    // try {
-    //     if (!mongoose.isValidObjectId(userID)) {
-    //         throw new Error("Invalid user ID format");
-    //     }
-    //     const user = await userModel.findByIdAndUpdate(userID, userData, {new: true});
-    //     if (!user) {
-    //         throw new Error("User not found");
-    //     }
-    //     return user;
-    // } catch (err) {
-    //     throw new ErrorProMax("Error updating user", err.message || '');
-    // }
-    throw new ErrorProMax("Error updating user", "feature disabled");
 };
 
 const deleteUser = async (userID) => {
@@ -167,7 +153,6 @@ module.exports = {
     createUser,
     getAllUsers,
     getUser,
-    updateUser,
     deleteUser,
     loginUser,
     changePassword,

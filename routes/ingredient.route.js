@@ -1,12 +1,23 @@
 const express = require('express');
-const { createIngredientController, getAllIngredientsController, getIngredientController, updateIngredientController, deleteIngredientController } = require('../controllers/ingredient.controller');
+const {
+    createIngredientController,
+    getAllIngredientsController,
+    getIngredientController,
+    updateIngredientController,
+    deleteIngredientController
+} = require('../controllers/ingredient.controller');
+const {
+    ingredientCreateValidation,
+    ingredientUpdateValidation,
+} = require('../validation/ingredient.validator');
+const { idValidation } = require('../validation/IDValidation');
 
 const router = express.Router();
 
-router.post("/create", createIngredientController);
+router.post("/create", ingredientCreateValidation, createIngredientController);
 router.get("/getAll", getAllIngredientsController);
-router.get("/get/:id", getIngredientController);
-router.put("/update/:id", updateIngredientController);
-router.delete("/delete/:id", deleteIngredientController);
+router.get("/get/:id", idValidation(), getIngredientController);
+router.put("/update/:id", ingredientUpdateValidation, updateIngredientController);
+router.delete("/delete/:id", idValidation(), deleteIngredientController);
 
 module.exports = router;
