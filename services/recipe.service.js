@@ -68,9 +68,7 @@ const deleteRecipe = async (recipeID) => {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        console.log("recieved:", recipeID);
         const recipe = await recipeModel.findByIdAndDelete(recipeID);
-        console.log("recipe:", recipe);
         
         if (!recipe) {
             throw new Error("Recipe not found");

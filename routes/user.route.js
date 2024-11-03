@@ -1,31 +1,26 @@
 const express = require('express');
 const {
-    createUserController,
     getAllUsersController,
     getUserController,
     deleteUserController,
-    loginController,
     changePasswordController,
     deleteRecipesController,
     addRecipeController,
 } = require('../controllers/user.controller');
 const {
-    userValidation,
-    deleteRecipesValidation,
+    recipesValidation,
     changePasswordValidation,
 } = require('../validation/user.validator');
 const { recipeCreateValidation } = require('../validation/recipe.validator');
-const { idValidation } = require('../validation/IDValidation');
 
 const router = express.Router();
 
-router.post("/register", userValidation, createUserController);
-router.post("/cp/:id", changePasswordValidation(), changePasswordController);
-router.delete("/:id/delete/recipes", deleteRecipesValidation, deleteRecipesController);
-router.post("/:id/add/recipe", recipeCreateValidation, addRecipeController);
+router.post("/cp", changePasswordValidation(), changePasswordController);
+router.delete("/delete/recipes", recipesValidation(), deleteRecipesController);
+router.post("/add/recipe", recipeCreateValidation, addRecipeController);
 
 router.get("/getAll", getAllUsersController);
-router.get("/get/:id", idValidation(), getUserController);
-router.delete("/delete/:id", idValidation(), deleteUserController);
+router.get("/get", getUserController);
+router.delete("/delete", deleteUserController);
 
 module.exports = router;

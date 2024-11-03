@@ -1,5 +1,4 @@
 const { check, body } = require('express-validator');
-const { idValidation } = require('../validation/IDValidation');
 
 const usernameValidation = () => [
     check('username')
@@ -16,12 +15,17 @@ const emailValidation = () => [
 
 const passwordValidation = () => [
     check('password')
-        .notEmpty().withMessage("Password is required")
-        .isLength({ min: 6, max: 180 }).withMessage("Password must be between 6 and 180 characters long"),
+        .notEmpty()
+        .withMessage("Password is required")
+        .isLength({ min: 6, max: 180 })
+        .withMessage("Password must be between 6 and 180 characters long")
+        .isStrongPassword()
+        .withMessage("New password should contain lowercase, uppercase, number, and special characters"),
 ];
 
 const recipesValidation = () => [
     body('recipes')
+        .optional()
         .isArray({ min: 1 }).withMessage("Recipes must be an array with at least one recipe")
         .custom((value) => {
             const hasDuplicates = new Set(value.map(String)).size !== value.length;
@@ -40,14 +44,10 @@ const changePasswordValidation = () => [
     check('newPassword')
         .notEmpty()
         .withMessage("New password is required")
-        .isLength({ min: 6 })
-        .withMessage("New password must be at least 6 characters long")
+        .isLength({ min: 6, max: 180 })
+        .withMessage("New password must be between 6 and 180 characters long")
         .isStrongPassword()
         .withMessage("New password should contain lowercase, uppercase, number, and special characters"),
-];
-
-const deleteRecipesValidation = [
-    ...recipesValidation(),
 ];
 
 const userValidation = [
@@ -59,7 +59,6 @@ const userValidation = [
 
 module.exports = {
     userValidation,
-    deleteRecipesValidation,
     recipesValidation,
     changePasswordValidation,
 };

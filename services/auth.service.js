@@ -22,6 +22,15 @@ const loginUser = async ({ usernameOrEmail, password }) => {
     }
 };
 
+const clearToken = (res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        sameSite: 'Strict'
+    });
+};
+
+
 module.exports = {
     loginUser,
+    clearToken,
 }

@@ -9,8 +9,10 @@ dotenv.config();
 
 const createUser = async (userData) => {
     try {
+        
         const user = new userModel(userData);
         await user.save();
+        
         // exclude the password from the returned user object
         const { password, ...userWithoutPassword } = user.toObject();
         return userWithoutPassword;
@@ -32,9 +34,6 @@ const getAllUsers = async () => {
 
 const getUser = async (userID) => {
     try {
-        if (!mongoose.isValidObjectId(userID)) {
-            throw new Error("Invalid user ID format");
-        }
         const user = await userModel.findById(userID);
         // const user = await userModel.findById(userID).populate('recipes', '_id ingredients');
         if (!user) {
@@ -49,10 +48,6 @@ const getUser = async (userID) => {
 
 const deleteUser = async (userID) => {
     try {
-        if (!mongoose.isValidObjectId(userID)) {
-            throw new Error("Invalid user ID format");
-        }
-        
         const user = await userModel.findByIdAndDelete(userID);
         if (!user) {
             throw new Error("User not found");
@@ -80,33 +75,32 @@ const changePassword = async ({ user, oldPassword, newPassword }) => {
 };
 
 const deleteRecipes = async (id, recipeIDs) => {
-    if (!mongoose.isValidObjectId(id)) {
-        throw new Error("Invalid user ID format");
-    }
-
-    if (!Array.isArray(recipeIDs)) {
-        throw new Error("Recipes must be an array of IDs");
-    }
-
     try {
-        if (!Array.isArray(recipeIDs) || recipeIDs.length === 0) {
-            throw new Error("recipes must be a non-empty array.");
+        if (Array.isArray(recipeIDs) || recipeIDs.length !== 0) {
+            // delete every recipe in the array
+            for (const recipeID of recipeIDs) {
+                await deleteRecipe(recipeID);
+            }
         }
-        
-        // delete every recipe in the array
-        for (const recipeID of recipeIDs) {
-            await deleteRecipe(recipeID);
-        }
-
-        // update user recipes array
-        await userModel.updateOne(
-            { _id: id },
-            { $pull: { recipes: { $in: recipeIDs } } }
-        );
     } catch (err) {
         throw new ErrorProMax('Error deleting recipes', err.message || '');
     }
-}
+};
+
+const updateUserRecipes = async (userId, recipeIDs) => {
+    try {
+        if (!Array.isArray(recipeIDs) || recipeIDs.length === 0) {
+            throw new Error("Recipes must be a non-empty array");
+        }
+
+        await userModel.updateOne(
+            { _id: userId },
+            { $pull: { recipes: { $in: recipeIDs } } }
+        );
+    } catch (err) {
+        throw new ErrorProMax("Error updating user recipes", err.message || '');
+    }
+};
 
 const addRecipe = async (id, recipe) => {
     try {
@@ -122,7 +116,7 @@ const addRecipe = async (id, recipe) => {
     } catch (err) {
         throw new ErrorProMax('Error adding recipe', err.message || '');
     }
-}
+};
 
 const findByUsernameOrEmail = async (usernameOrEmail) => {
     try {
@@ -134,9 +128,9 @@ const findByUsernameOrEmail = async (usernameOrEmail) => {
         }
         return user;
     } catch (err) {
-        throw new ErrorProMax('Error adding recipe', err.message || '');
+        throw new ErrorProMax('Error finding user', err.message || '');
     }
-}
+};
 
 
 module.exports = {
@@ -146,6 +140,7 @@ module.exports = {
     deleteUser,
     changePassword,
     deleteRecipes,
+    updateUserRecipes,
     addRecipe,
     findByUsernameOrEmail,
 }

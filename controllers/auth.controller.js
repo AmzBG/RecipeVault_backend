@@ -1,4 +1,4 @@
-const { loginUser } = require("../services/auth.service");
+const { loginUser, clearToken } = require("../services/auth.service");
 const jwt = require('jsonwebtoken');
 
 const loginController = async (req, res) => {
@@ -27,6 +27,12 @@ const loginController = async (req, res) => {
     }
 };
 
+const logoutController = (req, res) => {
+    clearToken(res);
+    res.status(200).json({ message: "Logout successful" });
+}
+
 module.exports = {
     loginController,
+    logoutController,
 }
