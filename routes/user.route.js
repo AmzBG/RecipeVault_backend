@@ -20,7 +20,6 @@ const { idValidation } = require('../validation/IDValidation');
 const router = express.Router();
 
 router.post("/register", userValidation, createUserController);
-router.post("/login", loginController);
 router.post("/cp/:id", changePasswordValidation(), changePasswordController);
 router.delete("/:id/delete/recipes", deleteRecipesValidation, deleteRecipesController);
 router.post("/:id/add/recipe", recipeCreateValidation, addRecipeController);

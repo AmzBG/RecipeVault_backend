@@ -64,30 +64,6 @@ const deleteUser = async (userID) => {
     }
 };
 
-const loginUser = async ({ usernameOrEmail, password }) => {
-    try {
-        const user = await userModel.findOne({
-            $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }]
-        });
-        
-        if (!user) {
-            throw new Error('User not found');
-        }
-        console.log("login, password:", password);
-        console.log("login, user.password:", user.password);
-        
-        const isMatch = await bcrypt.compare(password, user.password);
-        
-        if (!isMatch) {
-            throw new Error('Incorrect password');
-        }
-
-        return user;
-    } catch (err) {
-        throw new ErrorProMax('Error during login', err.message || ''); 
-    }
-};
-
 const changePassword = async ({ user, oldPassword, newPassword }) => {
     try {
         const isMatch = await bcrypt.compare(oldPassword, user.password);
@@ -148,14 +124,28 @@ const addRecipe = async (id, recipe) => {
     }
 }
 
+const findByUsernameOrEmail = async (usernameOrEmail) => {
+    try {
+        const user = await userModel.findOne({
+            $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }]
+        });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user;
+    } catch (err) {
+        throw new ErrorProMax('Error adding recipe', err.message || '');
+    }
+}
+
 
 module.exports = {
     createUser,
     getAllUsers,
     getUser,
     deleteUser,
-    loginUser,
     changePassword,
     deleteRecipes,
     addRecipe,
+    findByUsernameOrEmail,
 }

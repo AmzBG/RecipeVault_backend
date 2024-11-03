@@ -89,23 +89,6 @@ const deleteUserController = async (req, res) => {
     }
 }
 
-const loginController = async (req, res) => {
-    const credentials = req.body;
-
-    try {
-        const user = await loginUser(credentials);
-        res.status(200).json({user});
-    } catch (err) {
-        res.status(401).json({ 
-            message: "Intenal error occured",
-            details: {
-                error: err.message,
-                info: err.details
-            }
-        });
-    }
-};
-
 const changePasswordController = async (req, res) => {
     const errors = validationResult(req);
 
@@ -187,7 +170,6 @@ module.exports = {
     getAllUsersController,
     getUserController,
     deleteUserController,
-    loginController,
     changePasswordController,
     deleteRecipesController,
     addRecipeController,

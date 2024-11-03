@@ -47,7 +47,6 @@ const changePasswordValidation = () => [
 ];
 
 const deleteRecipesValidation = [
-    ...idValidation(),
     ...recipesValidation(),
 ];
 
@@ -61,5 +60,6 @@ const userValidation = [
 module.exports = {
     userValidation,
     deleteRecipesValidation,
+    recipesValidation,
     changePasswordValidation,
 };
