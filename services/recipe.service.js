@@ -31,6 +31,31 @@ const getAllRecipes = async (userID) => {
     // throw new ErrorProMax("Error getting recipes", "feature disabled");
 }
 
+const getPagedRecipes = async (userID, page = 1, limit = 10) => {
+    try {
+        const skip = (page - 1) * limit;
+
+        // Retrieve only the essential fields for displaying cards
+        const recipes = await recipeModel.find({ userID })
+            .select('name prepLevel servings categories pictureURL totalPrepTime')
+            .skip(skip)
+            .limit(limit);
+
+        const total = await recipeModel.countDocuments({ userID });
+
+        return {
+            recipes,
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+        };
+    } catch (err) {
+        throw new ErrorProMax("Error getting recipes", err.message || '');
+    }
+};
+
+
+
 const getRecipe = async (recipeID, userID) => {
     try {
         if (!mongoose.isValidObjectId(recipeID)) {
@@ -96,6 +121,7 @@ const deleteAllRecipes = async (userID) => {
 module.exports = {
     createRecipe,
     getAllRecipes,
+    getPagedRecipes,
     getRecipe,
     updateRecipe,
     deleteRecipe,

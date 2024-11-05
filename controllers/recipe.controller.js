@@ -1,4 +1,4 @@
-const { createRecipe, getAllRecipes, getRecipe, updateRecipe, deleteRecipe } = require("../services/recipe.service");
+const { createRecipe, getAllRecipes, getRecipe, updateRecipe, deleteRecipe, getPagedRecipes } = require("../services/recipe.service");
 
 const createRecipeController = async (req, res) => {
     try {
@@ -29,6 +29,24 @@ const getAllRecipesController = async (req, res) => {
                 error: err.message,
                 info: err.details
             }});
+        }
+    }
+    
+const getPagedRecipesController = async (req, res) => {
+    const userID = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    
+    try {
+        const result = await getPagedRecipes(userID, page, limit);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json({
+            message: "Intenal error occured",
+            details: {
+                error: err.message,
+                info: err.details
+        }});
     }
 }
 
@@ -84,6 +102,7 @@ const deleteRecipeController = async (req, res) => {
 module.exports = {
     createRecipeController,
     getAllRecipesController,
+    getPagedRecipesController,
     getRecipeController,
     updateRecipeController,
     deleteRecipeController,
