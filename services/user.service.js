@@ -74,19 +74,6 @@ const changePassword = async ({ user, oldPassword, newPassword }) => {
     }
 };
 
-const deleteRecipes = async (id, recipeIDs) => {
-    try {
-        if (Array.isArray(recipeIDs) || recipeIDs.length !== 0) {
-            // delete every recipe in the array
-            for (const recipeID of recipeIDs) {
-                await deleteRecipe(recipeID);
-            }
-        }
-    } catch (err) {
-        throw new ErrorProMax('Error deleting recipes', err.message || '');
-    }
-};
-
 const findByUsernameOrEmail = async (usernameOrEmail) => {
     try {
         const user = await userModel.findOne({
@@ -108,6 +95,5 @@ module.exports = {
     getUser,
     deleteUser,
     changePassword,
-    deleteRecipes,
     findByUsernameOrEmail,
 }

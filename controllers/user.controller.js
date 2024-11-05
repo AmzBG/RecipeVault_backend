@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
-const { createUser, getAllUsers, getUser, deleteUser, changePassword, deleteRecipes } = require("../services/user.service");
+const { createUser, getAllUsers, getUser, deleteUser, changePassword } = require("../services/user.service");
 const { clearToken } = require("../services/auth.service");
+const { deleteAllRecipes } = require("../services/recipe.service");
 
 const createUserController = async (req, res) => {
     // Check if user is already logged in    
@@ -71,13 +72,12 @@ const deleteUserController = async (req, res) => {
     if(!errors.isEmpty()) {
         return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
     }
-    const id = req.user.id;
+    const userID = req.user.id;
 
     try {
-        const user = await deleteUser(id);
+        const user = await deleteUser(userID);
         
-        // also delete recipes associated with the user
-        await deleteRecipes(id, user.recipes);
+        await deleteAllRecipes(userID);
 
         // and logout
         clearToken(res);

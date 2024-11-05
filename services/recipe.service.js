@@ -84,10 +84,20 @@ const deleteRecipe = async (recipeID, userID) => {
     }
 }
 
+const deleteAllRecipes = async (userID) => {
+    try {
+        const recipes = await recipeModel.deleteMany({ userID });
+        return recipes;
+    } catch (err) {
+        throw new ErrorProMax("Error deleting recipe", err.message || '');
+    }
+}
+
 module.exports = {
     createRecipe,
     getAllRecipes,
     getRecipe,
     updateRecipe,
-    deleteRecipe
+    deleteRecipe,
+    deleteAllRecipes,
 }
