@@ -13,9 +13,9 @@ const createRecipe = async (recipeData) => {
     }
 }
 
-const getAllRecipes = async () => {
+const getAllRecipes = async (userID) => {
     try {
-        const recipes = await recipeModel.find();
+        const recipes = await recipeModel.find({ userID });
         // const recipes = await recipeModel.find().populate({
         //     path: 'ingredients',
         //     // populate: {
@@ -31,12 +31,12 @@ const getAllRecipes = async () => {
     // throw new ErrorProMax("Error getting recipes", "feature disabled");
 }
 
-const getRecipe = async (recipeID) => {
+const getRecipe = async (recipeID, userID) => {
     try {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findById(recipeID);
+        const recipe = await recipeModel.findOne({ _id: recipeID, userID });
         // const recipe = await recipeModel.findById(recipeID).populate('ingredients', 'id name');
         if (!recipe) {
             throw new Error("Recipe not found");
@@ -52,7 +52,12 @@ const updateRecipe = async (recipeID, recipeData) => {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findByIdAndUpdate(recipeID, recipeData, {new: true});
+        const recipe = await recipeModel.findOneAndUpdate(
+            { _id: recipeID, userID: recipeData.userID },
+            recipeData,
+            {new: true}
+        );
+
         if (!recipe) {
             throw new Error("Recipe not found");
         }
@@ -62,13 +67,13 @@ const updateRecipe = async (recipeID, recipeData) => {
     }
 }
 
-const deleteRecipe = async (recipeID) => {
+const deleteRecipe = async (recipeID, userID) => {
     try {
         
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findByIdAndDelete(recipeID);
+        const recipe = await recipeModel.findOneAndDelete({ _id: recipeID, userID });
         
         if (!recipe) {
             throw new Error("Recipe not found");

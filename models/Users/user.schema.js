@@ -26,17 +26,6 @@ const userSchema = mongoose.Schema(
             trim: true,
             minlength: [6, "Username must be at least 6 characters long"],
             maxlength: [180, "Username must be at most 180 characters long"]
-        },
-        recipes: {
-            type: [mongoose.Schema.Types.ObjectId],
-            ref: 'recipes',
-            validate: {
-                validator: function(value) {
-                    // Check for duplicate values in the recipes array
-                    return Array.isArray(value) && new Set(value.map(String)).size === value.length;
-                },
-                message: "Duplicate recipes are not allowed."
-            }
         }
     },
     {

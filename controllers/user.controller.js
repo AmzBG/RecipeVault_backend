@@ -1,8 +1,13 @@
 const { validationResult } = require("express-validator");
-const { createUser, getAllUsers, getUser, deleteUser, changePassword, deleteRecipes, updateUserRecipes, addRecipe } = require("../services/user.service");
+const { createUser, getAllUsers, getUser, deleteUser, changePassword, deleteRecipes } = require("../services/user.service");
 const { clearToken } = require("../services/auth.service");
 
 const createUserController = async (req, res) => {
+    // Check if user is already logged in    
+    if (req.user) {
+        return res.status(403).json({ message: "You are already logged in and cannot create a new account." });
+    }
+
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
@@ -112,58 +117,10 @@ const changePasswordController = async (req, res) => {
     }
 };
 
-const deleteRecipesController = async(req, res) => {
-    const errors = validationResult(req);
-
-    if(!errors.isEmpty()) {
-        return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
-    }
-    const id = req.user.id;
-    const { recipes } = req.body;
-
-    try {
-        await deleteRecipes(id, recipes);
-        await updateUserRecipes(id, recipes);
-        res.status(200).json("deleted successfully");
-    } catch (err) {
-        res.status(400).json({
-            message: "Intenal error occured",
-            details: {
-                error: err.message,
-                info: err.details
-            }
-        });
-    }
-}
-
-const addRecipeController = async(req, res) => {
-    const errors = validationResult(req);
-
-    if(!errors.isEmpty()) {
-        return res.status(400).json({ status: 'validation-error', validationErrors: errors.array().map(error => error.msg) });
-    }
-    const recipe = req.body;
-    
-    try {        
-        const newRecipe = await addRecipe(req.user.id, recipe);
-        res.status(200).json({newRecipe});
-    } catch (err) {
-        res.status(400).json({
-            message: "Intenal error occured",
-            details: {
-                error: err.message,
-                info: err.details
-            }
-        });
-    }
-}
-
 module.exports = {
     createUserController,
     getAllUsersController,
     getUserController,
     deleteUserController,
     changePasswordController,
-    deleteRecipesController,
-    addRecipeController,
 }

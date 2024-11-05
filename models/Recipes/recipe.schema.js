@@ -10,6 +10,11 @@ const recipeSchema = mongoose.Schema(
             minlength: [3, "Recipe name must be at least 3 characters long"],
             maxlength: [180, "Recipe name must not exceed 180 characters long"]
         },
+        userID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
+            required: [true, "Recipe must below to a user"]
+        },
         ingredients: {
             type: [mongoose.Schema.Types.ObjectId],
             ref: 'ingredients',
