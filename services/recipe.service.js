@@ -118,6 +118,18 @@ const deleteAllRecipes = async (userID) => {
     }
 }
 
+const getRecipeByName = async (name, userID) =>{
+    try {
+        const recipes = await recipeModel.find({ 
+            name: { $regex: name, $options: 'i' },
+            userID 
+        });
+        return recipes;
+    } catch (err) {
+        throw new ErrorProMax("Error getting recipe", err.message || '');
+    }
+}
+
 module.exports = {
     createRecipe,
     getAllRecipes,
@@ -126,4 +138,5 @@ module.exports = {
     updateRecipe,
     deleteRecipe,
     deleteAllRecipes,
+    getRecipeByName,
 }

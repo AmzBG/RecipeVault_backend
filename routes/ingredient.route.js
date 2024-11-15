@@ -4,7 +4,8 @@ const {
     getAllIngredientsController,
     getIngredientController,
     updateIngredientController,
-    deleteIngredientController
+    deleteIngredientController,
+    getAllIngredientNamesController
 } = require('../controllers/ingredient.controller');
 const {
     ingredientCreateValidation,
@@ -16,6 +17,7 @@ const router = express.Router();
 
 router.post("/create", ingredientCreateValidation, createIngredientController);
 router.get("/getAll", getAllIngredientsController);
+router.get("/getAllNames", getAllIngredientNamesController);
 router.get("/get/:id", idValidation(), getIngredientController);
 router.put("/update/:id", ingredientUpdateValidation, updateIngredientController);
 router.delete("/delete/:id", idValidation(), deleteIngredientController);

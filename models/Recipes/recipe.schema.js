@@ -76,22 +76,22 @@ const recipeSchema = mongoose.Schema(
         pictureURL: {
             type: String,
             trim: true,
-            validate: {
-                validator: function(v) {
-                    return /^https?:\/\/.+/.test(v);
-                },
-                message: "Must be a valid URL"
-            }
+            // validate: {
+            //     validator: function(v) {
+            //         return /^https?:\/\/.+/.test(v);
+            //     },
+            //     message: "Must be a valid URL"
+            // }
         },
         videoURL: {
             type: String,
             trim: true,
-            validate: {
-                validator: function(v) {
-                    return /^https?:\/\/.+/.test(v);
-                },
-                message: "Must be a valid URL"
-            }
+            // validate: {
+            //     validator: function(v) {
+            //         return /^https?:\/\/.+/.test(v);
+            //     },
+            //     message: "Must be a valid URL"
+            // }
         },
         source: {
             type: String,

@@ -1,10 +1,13 @@
-const { createRecipe, getAllRecipes, getRecipe, updateRecipe, deleteRecipe, getPagedRecipes } = require("../services/recipe.service");
+const { getIngredientIDs } = require("../services/ingredient.service");
+const { createRecipe, getAllRecipes, getRecipe, updateRecipe, deleteRecipe, getPagedRecipes, getRecipeByName } = require("../services/recipe.service");
 
 const createRecipeController = async (req, res) => {
     try {
         // get userID from token
         const userID = req.user.id;
         const recipe = { ...req.body, userID };
+        const ingredientsIDs = await getIngredientIDs(recipe.ingredients);
+        recipe.ingredients = ingredientsIDs;
         const newRecipe = await createRecipe(recipe);
         res.status(200).json({newRecipe});
     } catch (err) {
@@ -20,8 +23,8 @@ const createRecipeController = async (req, res) => {
 const getAllRecipesController = async (req, res) => {
     try {
         const userID = req.user.id;
-        const recipies = await getAllRecipes(userID);
-        res.status(200).json({recipies});    
+        const recipes = await getAllRecipes(userID);
+        res.status(200).json({recipes});    
     } catch (err) {
         res.status(500).json({
             message: "Intenal error occured",
@@ -99,6 +102,22 @@ const deleteRecipeController = async (req, res) => {
     }
 }
 
+const getRecipeByNameController = async (req, res) => {
+    try {
+        const name = req.params.name;
+        const userID = req.user.id;
+        const recipes = await getRecipeByName(name, userID);
+        res.status(200).json({recipes});
+    } catch (err) {
+        res.status(500).json({
+            message: "Intenal error occured",
+            details: {
+                error: err.message,
+                info: err.details
+            }});
+    }
+}
+
 module.exports = {
     createRecipeController,
     getAllRecipesController,
@@ -106,4 +125,5 @@ module.exports = {
     getRecipeController,
     updateRecipeController,
     deleteRecipeController,
+    getRecipeByNameController,
 }

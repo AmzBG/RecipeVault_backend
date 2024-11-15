@@ -32,7 +32,12 @@ const logoutController = (req, res) => {
     res.status(200).json({ message: "Logout successful" });
 }
 
+const verifyUserController = (req, res) => {
+    res.status(200);
+}
+
 module.exports = {
     loginController,
     logoutController,
+    verifyUserController,
 }

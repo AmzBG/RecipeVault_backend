@@ -20,7 +20,7 @@ app.use(express.json()); // this now is a replacement of body-parser as express 
 app.use(cookieParser());
 
 app.use(cors({
-    origin: 'http://localhost:3000', //! Replace with your frontend origin
+    origin: 'http://localhost:5173',
     credentials: true // Allow credentials (cookies) to be sent
 }));
 
@@ -35,7 +35,14 @@ connectDB();
 app.use('/api', authRoute);
 
 // apply authentication middleware to all routes
-app.use(authenticateToken);
+// app.use(authenticateToken);
+//! Enable when frontend authentication is done
+app.use((req, res, next) => {
+    if (!req.user) {
+        req.user = {id: "672bbf21fb4925ba371bd001"};
+    }
+    next();
+});
 
 app.use('/api/users', userRoute);
 app.use('/api/ingredientCategories', ingredientCategoryRoute);
