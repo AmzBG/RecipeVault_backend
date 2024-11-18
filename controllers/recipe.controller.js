@@ -6,8 +6,6 @@ const createRecipeController = async (req, res) => {
         // get userID from token
         const userID = req.user.id;
         const recipe = { ...req.body, userID };
-        const ingredientsIDs = await getIngredientIDs(recipe.ingredients);
-        recipe.ingredients = ingredientsIDs;
         const newRecipe = await createRecipe(recipe);
         res.status(200).json({newRecipe});
     } catch (err) {

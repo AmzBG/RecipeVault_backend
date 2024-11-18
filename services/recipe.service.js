@@ -15,7 +15,10 @@ const createRecipe = async (recipeData) => {
 
 const getAllRecipes = async (userID) => {
     try {
-        const recipes = await recipeModel.find({ userID });
+        const recipes = await recipeModel.find({ userID }).populate({
+            path: 'ingredients',
+            select: "name"
+        }).lean();
         // const recipes = await recipeModel.find().populate({
         //     path: 'ingredients',
         //     // populate: {

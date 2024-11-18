@@ -71,7 +71,7 @@ const deleteIngredient = async (ingredientID) => {
 
 const getAllIngredientNames = async () => {
     try {
-        const ingredients = await ingredientModel.find({}, { _id: false, name: true });
+        const ingredients = await ingredientModel.find({}, { name: true });
         return ingredients;
     } catch (err) {
         throw new ErrorProMax("Error getting ingredients", err.message || '');
