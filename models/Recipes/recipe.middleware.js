@@ -1,11 +1,21 @@
+const { mongoose } = require("mongoose");
+
 function applyMiddleware(schema) {
 
-  // unique names
-  schema.post('save', function (error, doc, next) {
-    if (error.name === 'MongoServerError' && error.code === 11000) {
-      next(new Error('A recipe with that name already exists. Please use a different name.'));
-    } else {
-      next(error);
+ // Pre-save middleware to check unique name per user
+  schema.pre('save', async function (next) {
+    try {
+        const existingRecipe = await mongoose.models.recipes.findOne({
+            name: this.name,
+            userID: this.userID
+        });
+
+        if (existingRecipe && existingRecipe._id.toString() !== this._id.toString()) {
+            return next(new Error('A recipe with this name already exists for this user.'));
+        }
+        next();
+    } catch (err) {
+        next(err); // Pass error to save call
     }
   });
 

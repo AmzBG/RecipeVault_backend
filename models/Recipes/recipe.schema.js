@@ -6,14 +6,13 @@ const recipeSchema = mongoose.Schema(
             type: String,
             required: [true, "Recipe must have a name"],
             trim: true,
-            unique: true,
             minlength: [3, "Recipe name must be at least 3 characters long"],
             maxlength: [180, "Recipe name must not exceed 180 characters long"]
         },
         userID: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
-            required: [true, "Recipe must below to a user"]
+            required: [true, "Recipe must belong to a user"]
         },
         ingredients: {
             type: [mongoose.Schema.Types.ObjectId],
@@ -75,23 +74,11 @@ const recipeSchema = mongoose.Schema(
         },
         pictureURL: {
             type: String,
-            trim: true,
-            // validate: {
-            //     validator: function(v) {
-            //         return /^https?:\/\/.+/.test(v);
-            //     },
-            //     message: "Must be a valid URL"
-            // }
+            trim: true
         },
         videoURL: {
             type: String,
-            trim: true,
-            // validate: {
-            //     validator: function(v) {
-            //         return /^https?:\/\/.+/.test(v);
-            //     },
-            //     message: "Must be a valid URL"
-            // }
+            trim: true
         },
         source: {
             type: String,
@@ -106,5 +93,8 @@ const recipeSchema = mongoose.Schema(
         timestamps: true,
     }
 );
+
+// Compound index for uniqueness of { name, userID }
+recipeSchema.index({ name: 1, userID: 1 }, { unique: true });
 
 module.exports = recipeSchema;
