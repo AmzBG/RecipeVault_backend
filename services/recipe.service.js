@@ -13,9 +13,12 @@ const createRecipe = async (recipeData) => {
     }
 }
 
-const getAllRecipes = async () => {
+const getAllRecipes = async (userID) => {
     try {
-        const recipes = await recipeModel.find();
+        const recipes = await recipeModel.find({ userID }).populate({
+            path: 'ingredients',
+            select: "name"
+        }).lean();
         // const recipes = await recipeModel.find().populate({
         //     path: 'ingredients',
         //     // populate: {
@@ -31,12 +34,37 @@ const getAllRecipes = async () => {
     // throw new ErrorProMax("Error getting recipes", "feature disabled");
 }
 
-const getRecipe = async (recipeID) => {
+const getPagedRecipes = async (userID, page = 1, limit = 10) => {
+    try {
+        const skip = (page - 1) * limit;
+
+        // Retrieve only the essential fields for displaying cards
+        const recipes = await recipeModel.find({ userID })
+            .select('name prepLevel servings categories pictureURL totalPrepTime')
+            .skip(skip)
+            .limit(limit);
+
+        const total = await recipeModel.countDocuments({ userID });
+
+        return {
+            recipes,
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+        };
+    } catch (err) {
+        throw new ErrorProMax("Error getting recipes", err.message || '');
+    }
+};
+
+
+
+const getRecipe = async (recipeID, userID) => {
     try {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findById(recipeID);
+        const recipe = await recipeModel.findOne({ _id: recipeID, userID });
         // const recipe = await recipeModel.findById(recipeID).populate('ingredients', 'id name');
         if (!recipe) {
             throw new Error("Recipe not found");
@@ -52,7 +80,12 @@ const updateRecipe = async (recipeID, recipeData) => {
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findByIdAndUpdate(recipeID, recipeData, {new: true});
+        const recipe = await recipeModel.findOneAndUpdate(
+            { _id: recipeID, userID: recipeData.userID },
+            recipeData,
+            {new: true}
+        );
+
         if (!recipe) {
             throw new Error("Recipe not found");
         }
@@ -62,13 +95,13 @@ const updateRecipe = async (recipeID, recipeData) => {
     }
 }
 
-const deleteRecipe = async (recipeID) => {
+const deleteRecipe = async (recipeID, userID) => {
     try {
         
         if (!mongoose.isValidObjectId(recipeID)) {
             throw new Error("Invalid recipe ID format");
         }
-        const recipe = await recipeModel.findByIdAndDelete(recipeID);
+        const recipe = await recipeModel.findOneAndDelete({ _id: recipeID, userID });
         
         if (!recipe) {
             throw new Error("Recipe not found");
@@ -79,10 +112,34 @@ const deleteRecipe = async (recipeID) => {
     }
 }
 
+const deleteAllRecipes = async (userID) => {
+    try {
+        const recipes = await recipeModel.deleteMany({ userID });
+        return recipes;
+    } catch (err) {
+        throw new ErrorProMax("Error deleting recipe", err.message || '');
+    }
+}
+
+const getRecipeByName = async (name, userID) =>{
+    try {
+        const recipes = await recipeModel.find({ 
+            name: { $regex: name, $options: 'i' },
+            userID 
+        });
+        return recipes;
+    } catch (err) {
+        throw new ErrorProMax("Error getting recipe", err.message || '');
+    }
+}
+
 module.exports = {
     createRecipe,
     getAllRecipes,
+    getPagedRecipes,
     getRecipe,
     updateRecipe,
-    deleteRecipe
+    deleteRecipe,
+    deleteAllRecipes,
+    getRecipeByName,
 }

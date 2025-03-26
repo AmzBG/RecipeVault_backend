@@ -13,6 +13,7 @@ const authenticateToken = (req, res, next) => {
         next();
     } catch (err) {
         console.error("Token verification failed:", err);
+        res.cookie('token', '', { expires: new Date(0) }); // Remove the token from cookies
         res.status(403).json({ message: 'Invalid Token' });
     }
 };

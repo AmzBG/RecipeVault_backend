@@ -69,10 +69,34 @@ const deleteIngredient = async (ingredientID) => {
     }
 }
 
+const getAllIngredientNames = async () => {
+    try {
+        const ingredients = await ingredientModel.find({}, { name: true });
+        return ingredients;
+    } catch (err) {
+        throw new ErrorProMax("Error getting ingredients", err.message || '');
+    }
+}
+const getIngredientIDs = async (ingredientNames) => {
+    try {
+        const ingredients = await ingredientModel.find(
+            { name: { $in: ingredientNames } },
+            { _id: true }
+        );
+        const ingredientIDs = ingredients.map(ingredient => ingredient._id);
+        return ingredientIDs;
+    } catch (err) {
+        throw new Error("Error getting ingredients: " + (err.message || ''));
+    }
+};
+
+
 module.exports = {
     createIngredient,
     getAllIngredients,
     getIngredient,
     updateIngredient,
-    deleteIngredient
+    deleteIngredient,
+    getAllIngredientNames,
+    getIngredientIDs,
 }

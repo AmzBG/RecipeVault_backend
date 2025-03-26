@@ -32,7 +32,22 @@ const logoutController = (req, res) => {
     res.status(200).json({ message: "Logout successful" });
 }
 
+const verifyUserController = (req, res) => {
+    const token = req.cookies.token; // Get token from cookies
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+        res.status(200).json({ userId: decoded.id });
+    });
+};
+
+
 module.exports = {
     loginController,
     logoutController,
+    verifyUserController,
 }

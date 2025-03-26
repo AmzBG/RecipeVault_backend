@@ -74,50 +74,6 @@ const changePassword = async ({ user, oldPassword, newPassword }) => {
     }
 };
 
-const deleteRecipes = async (id, recipeIDs) => {
-    try {
-        if (Array.isArray(recipeIDs) || recipeIDs.length !== 0) {
-            // delete every recipe in the array
-            for (const recipeID of recipeIDs) {
-                await deleteRecipe(recipeID);
-            }
-        }
-    } catch (err) {
-        throw new ErrorProMax('Error deleting recipes', err.message || '');
-    }
-};
-
-const updateUserRecipes = async (userId, recipeIDs) => {
-    try {
-        if (!Array.isArray(recipeIDs) || recipeIDs.length === 0) {
-            throw new Error("Recipes must be a non-empty array");
-        }
-
-        await userModel.updateOne(
-            { _id: userId },
-            { $pull: { recipes: { $in: recipeIDs } } }
-        );
-    } catch (err) {
-        throw new ErrorProMax("Error updating user recipes", err.message || '');
-    }
-};
-
-const addRecipe = async (id, recipe) => {
-    try {
-        const newRecipe = await createRecipe(recipe);
-
-        // add recipeID to the user's recipes array
-        await userModel.updateOne(
-            { _id: id },
-            { $addToSet: { recipes: newRecipe._id } }
-        );
-        
-        return newRecipe;
-    } catch (err) {
-        throw new ErrorProMax('Error adding recipe', err.message || '');
-    }
-};
-
 const findByUsernameOrEmail = async (usernameOrEmail) => {
     try {
         const user = await userModel.findOne({
@@ -139,8 +95,5 @@ module.exports = {
     getUser,
     deleteUser,
     changePassword,
-    deleteRecipes,
-    updateUserRecipes,
-    addRecipe,
     findByUsernameOrEmail,
 }

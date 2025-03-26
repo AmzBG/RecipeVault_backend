@@ -10,6 +10,11 @@ const recipeSchema = mongoose.Schema(
             minlength: [3, "Recipe name must be at least 3 characters long"],
             maxlength: [180, "Recipe name must not exceed 180 characters long"]
         },
+        userID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
+            required: [true, "Recipe must below to a user"]
+        },
         ingredients: {
             type: [mongoose.Schema.Types.ObjectId],
             ref: 'ingredients',
@@ -71,22 +76,22 @@ const recipeSchema = mongoose.Schema(
         pictureURL: {
             type: String,
             trim: true,
-            validate: {
-                validator: function(v) {
-                    return /^https?:\/\/.+/.test(v);
-                },
-                message: "Must be a valid URL"
-            }
+            // validate: {
+            //     validator: function(v) {
+            //         return /^https?:\/\/.+/.test(v);
+            //     },
+            //     message: "Must be a valid URL"
+            // }
         },
         videoURL: {
             type: String,
             trim: true,
-            validate: {
-                validator: function(v) {
-                    return /^https?:\/\/.+/.test(v);
-                },
-                message: "Must be a valid URL"
-            }
+            // validate: {
+            //     validator: function(v) {
+            //         return /^https?:\/\/.+/.test(v);
+            //     },
+            //     message: "Must be a valid URL"
+            // }
         },
         source: {
             type: String,

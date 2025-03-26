@@ -1,4 +1,4 @@
-const { createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient } = require("../services/ingredient.service");
+const { createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient, getAllIngredientNames, getIngredientIDs } = require("../services/ingredient.service");
 
 const createIngredientController = async (req, res) => {
     try {
@@ -75,10 +75,25 @@ const deleteIngredientController = async (req, res) => {
     }
 }
 
+const getAllIngredientNamesController = async (req, res) => {
+    try {
+        const ingredients = await getAllIngredientNames();
+        res.status(200).json({ingredients});    
+    } catch (err) {
+        res.status(500).json({
+            message: "Intenal error occured",
+            details: {
+                error: err.message,
+                info: err.details
+            }});
+    }
+}
+
 module.exports = {
     createIngredientController,
     getAllIngredientsController,
     getIngredientController,
     updateIngredientController,
     deleteIngredientController,
+    getAllIngredientNamesController,
 }
