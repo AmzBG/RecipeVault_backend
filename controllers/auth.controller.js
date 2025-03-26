@@ -33,8 +33,18 @@ const logoutController = (req, res) => {
 }
 
 const verifyUserController = (req, res) => {
-    res.status(200);
-}
+    const token = req.cookies.token; // Get token from cookies
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+        res.status(200).json({ userId: decoded.id });
+    });
+};
+
 
 module.exports = {
     loginController,

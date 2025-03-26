@@ -13,7 +13,6 @@ const userRoute = require('./routes/user.route');
 const ingredientCategoryRoute = require('./routes/ingredientCategory.route');
 const ingredientRoute = require('./routes/ingredient.route');
 const recipeRoute = require('./routes/recipe.route');
-// const im = require('./import');
 
 const app = express();
 
@@ -29,21 +28,11 @@ dotenv.config();
 
 const PORT = process.env.PORT || 7000;
 
-// connect the database
-connectDB();
-
 // login
 app.use('/api', authRoute);
 
 // apply authentication middleware to all routes
-// app.use(authenticateToken);
-//! Enable when frontend authentication is done
-app.use((req, res, next) => {
-    if (!req.user) {
-        req.user = {id: "672bbf21fb4925ba371bd001"};
-    }
-    next();
-});
+app.use(authenticateToken);
 
 app.use('/api/users', userRoute);
 app.use('/api/ingredientCategories', ingredientCategoryRoute);
@@ -54,6 +43,14 @@ app.get('/', async (req, res) => {
     res.json("server running...");
 })
 
-app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
-})
+// connect the database and then start the server
+connectDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log("Server running on port " + PORT);
+        });
+    })
+    .catch((err) => {
+        console.error("Failed to connect to the database:", err);
+        process.exit(1); // Exit the process with failure
+    });
